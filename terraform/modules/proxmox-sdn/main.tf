@@ -17,5 +17,8 @@ resource "proxmox_sdn_subnet" "this" {
   gateway = var.gateway
   snat    = var.enable_snat
 
-  dhcp_range = var.dhcp_range
+  dhcp_range = {
+    start_address = var.dhcp_start_address
+    end_address   = var.dhcp_end_address
+  }
 }

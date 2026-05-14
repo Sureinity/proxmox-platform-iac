@@ -13,7 +13,8 @@ Creates a simple SDN zone, one VNet, and one subnet with gateway, DHCP range, an
 - `node_names`: Proxmox node names where the zone is available.
 - `subnet_cidr`: Subnet CIDR.
 - `gateway`: Gateway IP address.
-- `dhcp_range`: DHCP start and end addresses.
+- `dhcp_start_address`: DHCP start address.
+- `dhcp_end_address`: DHCP end address.
 - `enable_snat`: Enables subnet SNAT.
 - `ipam`, `dhcp`, `mtu`: Proxmox SDN settings.
 
@@ -36,9 +37,7 @@ module "platform_network" {
   subnet_cidr = "10.0.50.0/24"
   gateway     = "10.0.50.1"
 
-  dhcp_range = {
-    start_address = "10.0.50.100"
-    end_address   = "10.0.50.150"
-  }
+  dhcp_start_address = "10.0.50.100"
+  dhcp_end_address   = "10.0.50.150"
 }
 ```

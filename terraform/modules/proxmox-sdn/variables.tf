@@ -87,18 +87,22 @@ variable "enable_snat" {
   default     = true
 }
 
-variable "dhcp_range" {
-  type = object({
-    start_address = string
-    end_address   = string
-  })
-  description = "DHCP address range for the SDN subnet."
+variable "dhcp_start_address" {
+  type        = string
+  description = "DHCP range start address for the SDN subnet."
 
   validation {
-    condition = (
-      can(regex("^([0-9]{1,3}\\.){3}[0-9]{1,3}$", var.dhcp_range.start_address)) &&
-      can(regex("^([0-9]{1,3}\\.){3}[0-9]{1,3}$", var.dhcp_range.end_address))
-    )
-    error_message = "dhcp_range addresses must be IPv4 addresses."
+    condition     = can(regex("^([0-9]{1,3}\\.){3}[0-9]{1,3}$", var.dhcp_start_address))
+    error_message = "dhcp_start_address must be an IPv4 address."
+  }
+}
+
+variable "dhcp_end_address" {
+  type        = string
+  description = "DHCP range end address for the SDN subnet."
+
+  validation {
+    condition     = can(regex("^([0-9]{1,3}\\.){3}[0-9]{1,3}$", var.dhcp_end_address))
+    error_message = "dhcp_end_address must be an IPv4 address."
   }
 }
