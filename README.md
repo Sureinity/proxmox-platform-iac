@@ -2,6 +2,8 @@
 
 Enterprise-grade infrastructure-as-code reference for running Proxmox platform components with Terraform and Ansible.
 
+The repository preserves the original project intent: Proxmox SDN networking, Debian cloud image handling, reusable VM template creation, cloned VM provisioning, and Debian baseline configuration. Unsafe practice artifacts such as local state, debug logs, plaintext cloud-init passwords, and real tfvars are intentionally excluded.
+
 This repository is intentionally split by responsibility:
 
 - Terraform owns Proxmox infrastructure lifecycle: SDN, cloud image downloads, VM templates, and cloned VMs.
@@ -32,6 +34,8 @@ Production Terraform is split into independent root modules:
 
 Each root module has its own state file and must be migrated to a remote backend before shared use. Backend credentials are never committed.
 
+Terraform root modules do not call each other directly. Operators pass required outputs between state boundaries through reviewed variables, remote state data sources added by the operator, or an approved orchestration workflow.
+
 ## Apply Order
 
 Apply order is intentionally explicit:
@@ -45,9 +49,24 @@ Apply order is intentionally explicit:
 
 Secrets are supplied at runtime using environment variables, GitHub Actions secrets, SOPS, Vault, or 1Password CLI. Do not commit `.tfvars`, private keys, Proxmox API tokens, vault files, passwords, Terraform state, plans, or debug logs.
 
+Common Terraform runtime inputs:
+
+```bash
+export TF_VAR_proxmox_api_token="user@realm!token-id=token-secret"
+terraform -chdir=terraform/live/prod/network plan
+```
+
+Each root module includes a `terraform.tfvars.example` file. Copy it locally to `terraform.tfvars`, replace placeholders, and keep the real file untracked.
+
+## Ansible Handoff
+
+Run Terraform first, then generate or update a local Ansible inventory from `terraform/live/prod/workloads` output `ansible_inventory_hosts`. Ansible expects SSH key access through the cloud-init bootstrap user and then creates the long-lived automation user.
+
 ## CI Checks
 
 CI validates Terraform formatting and root-module configuration, Ansible syntax, YAML syntax, and static security checks without requiring live Proxmox credentials.
+
+Pull request checks intentionally use backend-disabled Terraform initialization and example Ansible inventory files. Authenticated plans and applies belong in protected deployment workflows with environment approvals.
 
 ## Documentation
 
