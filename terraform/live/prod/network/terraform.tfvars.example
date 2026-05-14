@@ -1,5 +1,5 @@
 proxmox_endpoint     = "https://pve.example.com:8006/"
-proxmox_api_token    = "user@realm!token-id=token-secret"
+proxmox_api_token    = "user@realm!token-id=REPLACE_WITH_TOKEN_SECRET"
 proxmox_insecure_tls = false
 
 zone_id    = "net1"
