@@ -1,0 +1,59 @@
+# Terraform local state and generated data
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.plan
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+
+# Terraform user-provided inputs
+*.tfvars
+*.tfvars.json
+!*.tfvars.example
+
+# Ansible local and secret artifacts
+*.retry
+*.vault
+vault.yml
+vault.yaml
+ansible/inventories/**/hosts.yml
+!ansible/inventories/**/hosts.yml.example
+ansible/inventories/**/group_vars/*.yml
+!ansible/inventories/**/group_vars/*.yml.example
+
+# Credentials and keys
+*.pem
+*.key
+id_rsa
+id_ed25519
+*.p12
+*.pfx
+.env
+.env.*
+!.env.example
+
+# Logs and debug output
+*.log
+logs/
+debug/
+
+# Editor and OS files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Tool caches
+.cache/
+.pytest_cache/
+.ruff_cache/
+__pycache__/
