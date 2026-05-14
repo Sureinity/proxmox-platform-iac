@@ -1,0 +1,53 @@
+---
+baseline_packages:
+  - ca-certificates
+  - chrony
+  - curl
+  - gnupg
+  - openssh-server
+  - python3
+  - python3-apt
+  - qemu-guest-agent
+  - sudo
+
+baseline_absent_packages:
+  - systemd-timesyncd
+
+baseline_services:
+  - chrony
+  - qemu-guest-agent
+  - ssh
+
+baseline_journald_persistent: true
+
+baseline_automation_user: ansible
+baseline_automation_user_authorized_keys: []
+
+baseline_ssh_disable_root_login: true
+baseline_ssh_disable_password_login: true
+
+baseline_install_docker: false
+baseline_docker_conflicting_packages:
+  - containerd
+  - docker-compose
+  - docker-doc
+  - docker.io
+  - podman-docker
+  - runc
+baseline_docker_keyring_dir: /etc/apt/keyrings
+baseline_docker_gpg_url: https://download.docker.com/linux/debian/gpg
+baseline_docker_gpg_path: /etc/apt/keyrings/docker.asc
+baseline_docker_repo_url: https://download.docker.com/linux/debian
+baseline_docker_repo_channel: stable
+baseline_docker_architecture_map:
+  aarch64: arm64
+  armv7l: armhf
+  x86_64: amd64
+baseline_docker_packages:
+  - containerd.io
+  - docker-buildx-plugin
+  - docker-ce
+  - docker-ce-cli
+  - docker-compose-plugin
+baseline_docker_users:
+  - "{{ baseline_automation_user }}"

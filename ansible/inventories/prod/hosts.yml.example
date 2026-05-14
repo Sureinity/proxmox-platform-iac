@@ -1,0 +1,11 @@
+---
+all:
+  children:
+    debian_trixie:
+      hosts:
+        portfolio_next_js:
+          ansible_host: 10.0.50.110
+        traefik_proxy:
+          ansible_host: 10.0.50.111
+      vars:
+        ansible_user: debian

@@ -1,0 +1,8 @@
+---
+- name: Configure Debian baseline
+  hosts: debian_trixie
+  gather_facts: true
+  become: true
+
+  roles:
+    - baseline

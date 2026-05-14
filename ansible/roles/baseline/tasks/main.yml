@@ -1,0 +1,151 @@
+---
+- name: Verify target distribution family
+  ansible.builtin.assert:
+    that:
+      - ansible_facts.os_family == "Debian"
+    fail_msg: "This baseline role is intended for Debian-family systems."
+
+- name: Refresh apt package cache
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Remove packages not used by the baseline
+  ansible.builtin.apt:
+    name: "{{ baseline_absent_packages }}"
+    state: absent
+  when: baseline_absent_packages | length > 0
+
+- name: Install baseline packages
+  ansible.builtin.apt:
+    name: "{{ baseline_packages }}"
+    state: present
+
+- name: Verify SSH key access is configured before disabling password login
+  ansible.builtin.assert:
+    that:
+      - baseline_automation_user_authorized_keys | length > 0
+    fail_msg: "Set baseline_automation_user_authorized_keys before disabling SSH password login."
+  when: baseline_ssh_disable_password_login | bool
+
+- name: Create automation user
+  ansible.builtin.user:
+    name: "{{ baseline_automation_user }}"
+    groups: sudo
+    append: true
+    shell: /bin/bash
+    create_home: true
+    state: present
+
+- name: Ensure automation user SSH directory exists
+  ansible.builtin.file:
+    path: "/home/{{ baseline_automation_user }}/.ssh"
+    state: directory
+    owner: "{{ baseline_automation_user }}"
+    group: "{{ baseline_automation_user }}"
+    mode: "0700"
+
+- name: Install authorized keys for automation user
+  ansible.builtin.copy:
+    dest: "/home/{{ baseline_automation_user }}/.ssh/authorized_keys"
+    owner: "{{ baseline_automation_user }}"
+    group: "{{ baseline_automation_user }}"
+    mode: "0600"
+    content: "{{ baseline_automation_user_authorized_keys | join('\n') }}\n"
+  when: baseline_automation_user_authorized_keys | length > 0
+
+- name: Configure passwordless sudo for automation user
+  ansible.builtin.copy:
+    dest: "/etc/sudoers.d/90-{{ baseline_automation_user }}"
+    owner: root
+    group: root
+    mode: "0440"
+    content: "{{ baseline_automation_user }} ALL=(ALL) NOPASSWD:ALL\n"
+    validate: "visudo -cf %s"
+
+- name: Configure SSH hardening
+  ansible.builtin.copy:
+    dest: /etc/ssh/sshd_config.d/90-baseline-hardening.conf
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      PermitRootLogin {{ 'no' if baseline_ssh_disable_root_login | bool else 'prohibit-password' }}
+      PasswordAuthentication {{ 'no' if baseline_ssh_disable_password_login | bool else 'yes' }}
+      KbdInteractiveAuthentication {{ 'no' if baseline_ssh_disable_password_login | bool else 'yes' }}
+    validate: "sshd -t -f %s"
+  notify: Restart ssh
+
+- name: Ensure persistent journald directory exists
+  ansible.builtin.file:
+    path: /var/log/journal
+    state: directory
+    owner: root
+    group: systemd-journal
+    mode: "2755"
+  when: baseline_journald_persistent | bool
+  notify: Restart systemd-journald
+
+- name: Remove packages that conflict with Docker Engine
+  ansible.builtin.apt:
+    name: "{{ baseline_docker_conflicting_packages }}"
+    state: absent
+  when: baseline_install_docker | bool
+
+- name: Ensure apt keyring directory exists for Docker
+  ansible.builtin.file:
+    path: "{{ baseline_docker_keyring_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  when: baseline_install_docker | bool
+
+- name: Install Docker official GPG key
+  ansible.builtin.get_url:
+    url: "{{ baseline_docker_gpg_url }}"
+    dest: "{{ baseline_docker_gpg_path }}"
+    owner: root
+    group: root
+    mode: "0644"
+  when: baseline_install_docker | bool
+
+- name: Configure Docker official apt repository
+  ansible.builtin.copy:
+    dest: /etc/apt/sources.list.d/docker.sources
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      Types: deb
+      URIs: {{ baseline_docker_repo_url }}
+      Suites: {{ ansible_facts.distribution_release }}
+      Components: {{ baseline_docker_repo_channel }}
+      Architectures: {{ baseline_docker_architecture_map[ansible_facts.architecture] | default(ansible_facts.architecture) }}
+      Signed-By: {{ baseline_docker_gpg_path }}
+  when: baseline_install_docker | bool
+
+- name: Install Docker Engine from Docker official repository
+  ansible.builtin.apt:
+    name: "{{ baseline_docker_packages }}"
+    state: present
+    update_cache: true
+  when: baseline_install_docker | bool
+
+- name: Add selected users to docker group
+  ansible.builtin.user:
+    name: "{{ item }}"
+    groups: docker
+    append: true
+  loop: "{{ baseline_docker_users }}"
+  when: baseline_install_docker | bool
+
+- name: Enable and start baseline services
+  ansible.builtin.service:
+    name: "{{ item }}"
+    enabled: true
+    state: started
+  loop: "{{ baseline_services + (['docker'] if baseline_install_docker | bool else []) }}"
+
+- name: Flush handlers after baseline service changes
+  ansible.builtin.meta: flush_handlers
