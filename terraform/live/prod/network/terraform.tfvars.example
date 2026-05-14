@@ -1,0 +1,17 @@
+proxmox_endpoint     = "https://pve.example.com:8006/"
+proxmox_api_token    = "user@realm!token-id=token-secret"
+proxmox_insecure_tls = false
+
+zone_id    = "net1"
+vnet_id    = "vnet1"
+node_names = ["pve01"]
+
+subnet_cidr = "10.0.50.0/24"
+gateway     = "10.0.50.1"
+
+dhcp_range = {
+  start_address = "10.0.50.100"
+  end_address   = "10.0.50.150"
+}
+
+enable_snat = true
