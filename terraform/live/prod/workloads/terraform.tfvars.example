@@ -1,0 +1,37 @@
+proxmox_endpoint     = "https://pve.example.com:8006/"
+proxmox_api_token    = "user@realm!token-id=token-secret"
+proxmox_insecure_tls = false
+
+template_vm_id          = 100
+default_node_name       = "pve01"
+default_bridge          = "vnet1"
+cloud_init_datastore_id = "local-lvm"
+bootstrap_username      = "debian"
+
+bootstrap_ssh_public_keys = [
+  "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIExamplePublicKeyOnly operator@example",
+]
+
+dns_servers = ["1.1.1.1", "8.8.8.8"]
+
+vms = {
+  portfolio_next_js = {
+    name          = "portfolio-next-js"
+    vm_id         = 110
+    ipv4_address  = "10.0.50.110/24"
+    ipv4_gateway  = "10.0.50.1"
+    cpu_cores     = 2
+    memory_mb     = 2048
+    ansible_group = "debian_trixie"
+  }
+
+  traefik_proxy = {
+    name          = "traefik-proxy"
+    vm_id         = 111
+    ipv4_address  = "10.0.50.111/24"
+    ipv4_gateway  = "10.0.50.1"
+    cpu_cores     = 2
+    memory_mb     = 2048
+    ansible_group = "debian_trixie"
+  }
+}
