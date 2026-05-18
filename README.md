@@ -2,7 +2,9 @@
 
 Enterprise-grade infrastructure-as-code reference for running Proxmox platform components with Terraform and Ansible.
 
-The repository preserves the original project intent: Proxmox SDN networking, Debian cloud image handling, reusable VM template creation, cloned VM provisioning, and Debian baseline configuration. Unsafe practice artifacts such as local state, debug logs, plaintext cloud-init passwords, and real tfvars are intentionally excluded.
+The repository is being shaped into a secure multi-tier application platform on Proxmox. It preserves the core project intent of segmented networking, reusable image and template handling, cloned VM provisioning, and guest baseline configuration.
+
+Repository policy forbids committed state files, real `.tfvars`, private keys, plaintext secrets, and similar local artifacts. Implementation cleanup and enforcement must continue to align the working tree with that policy.
 
 This repository is intentionally split by responsibility:
 
@@ -13,6 +15,7 @@ This repository is intentionally split by responsibility:
 ## Repository Layout
 
 ```text
+packer/                     # Planned image build pipeline
 terraform/
   modules/                 # Reusable Terraform modules
   live/prod/               # Production state boundaries
@@ -21,7 +24,7 @@ ansible/
   playbooks/               # Operational playbooks
   roles/                   # Idempotent guest configuration roles
 .github/workflows/         # Pull request validation
-docs/                      # Operating model and handoff documentation
+docs/                      # Diataxis documentation, ADRs, and roadmap
 ```
 
 ## State Boundaries
@@ -60,7 +63,7 @@ Each root module includes a `terraform.tfvars.example` file. Copy it locally to 
 
 ## Ansible Handoff
 
-Run Terraform first, then generate or update a local Ansible inventory from `terraform/live/prod/workloads` output `ansible_inventory_hosts`. Ansible expects SSH key access through the cloud-init bootstrap user and then creates the long-lived automation user.
+Run Terraform first, then generate or update a local Ansible inventory from the `terraform/live/prod/workloads` inventory output contract. The target Version 1 contract is `ansible_inventory`; implementation alignment is documented under `docs/`.
 
 ## CI Checks
 
@@ -72,7 +75,8 @@ Pull request checks intentionally use backend-disabled Terraform initialization 
 
 Start with:
 
-- [Operating model](docs/operating-model.md)
-- [State management](docs/state-management.md)
-- [Secrets management](docs/secrets-management.md)
-- [Ansible handoff](docs/ansible-handoff.md)
+- [Documentation index](docs/README.md)
+- [Architecture overview](docs/explanation/architecture-overview.md)
+- [State boundaries](docs/explanation/state-boundaries.md)
+- [Secrets management](docs/explanation/secrets-management.md)
+- [Ansible handoff](docs/explanation/ansible-handoff.md)
