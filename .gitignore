@@ -1,6 +1,5 @@
 # Terraform local state and generated data
 **/.terraform/
-**/.terraform.lock.hcl
 *.tfstate
 *.tfstate.*
 *.tfplan
@@ -19,6 +18,12 @@ terraform.rc
 *.tfvars
 *.tfvars.json
 !*.tfvars.example
+
+# Packer local inputs and cache
+*.pkrvars.hcl
+!*.pkrvars.hcl.example
+packer_cache/
+.packer_cache/
 
 # Ansible local and secret artifacts
 *.retry
