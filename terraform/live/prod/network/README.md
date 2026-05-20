@@ -2,42 +2,28 @@
 
 ## Owns
 
-This root module owns the production Proxmox SDN stack:
+This root module owns the production Linux bridge fabric and internal firewall contract for the platform:
 
-- Simple SDN zone
-- VNet
-- Subnet
-- Gateway
-- DHCP range
-- SNAT setting
+- `vmbr0` upstream transit or WAN connectivity
+- `vmbr10` for `mgmt`
+- `vmbr20` for `edge`
+- `vmbr30` for `app`
+- `vmbr40` for `data`
+- the internal OPNsense firewall VM role and interface placement contract
+- zone gateway definitions and the intended traffic-policy contract
+- optional DHCP or NAT behavior only where explicitly needed through OPNsense
 
 ## Must Not Own
 
-This stack must not create cloud images, VM templates, cloned VMs, or guest OS configuration.
+This stack must not create cloud images, VM templates, cloned workload VMs, or guest OS configuration.
 
-## Required Variables
+## Current State Note
 
-Set values with a local `terraform.tfvars` file copied from `terraform.tfvars.example`, environment variables, or a secret manager. Do not commit real `.tfvars`.
-
-- `proxmox_endpoint`
-- `proxmox_api_token`
-- `zone_id`
-- `vnet_id`
-- `node_names`
-- `subnet_cidr`
-- `gateway`
-- `dhcp_range`
-
-## Outputs
-
-- `zone_id`
-- `vnet_id`
-- `subnet_cidr`
-- `gateway`
+The accepted Version 1 design for this root is the four-zone bridge-and-firewall model above. The current Terraform implementation still reflects SDN-oriented, single-zone assumptions and must be realigned rather than extended as if that older shape were the target.
 
 ## Apply Order Dependency
 
-Apply this stack first. The image factory and workload stacks can then reference its VNet and subnet values.
+Apply this stack first. The image factory and workload stacks can then reference its bridge conventions, gateway ownership model, and traffic-policy contract.
 
 ## Backend Migration
 

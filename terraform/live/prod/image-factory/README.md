@@ -2,42 +2,25 @@
 
 ## Owns
 
-This root module owns production image-factory resources:
+This root module owns the Terraform-side image-factory integration boundary for production:
 
-- Debian cloud image download
-- Debian VM template creation
-- Cloud-init bootstrap user and SSH public keys for template-based provisioning
+- approved template metadata needed by downstream Terraform
+- non-secret template identity values passed to `workloads`
+- the clean lifecycle boundary between image construction and workload cloning
 
 ## Must Not Own
 
-This stack must not own SDN resources, cloned workload VMs, post-boot OS configuration, application services, or Ansible execution.
+This stack must not own Linux bridge fabric, the internal firewall VM, cloned workload VMs, post-boot OS configuration, application services, or Ansible execution.
 
-## Required Variables
+It also must not become the primary image builder. Packer owns image and template construction in Version 1.
 
-- `proxmox_endpoint`
-- `proxmox_api_token`
-- `node_name`
-- `image_datastore_id`
-- `vm_datastore_id`
-- `cloud_init_datastore_id`
-- `image_url`
-- `template_name`
-- `template_vm_id`
-- `template_bridge`
-- `bootstrap_username`
-- `bootstrap_ssh_public_keys`
+## Current State Note
 
-## Outputs
-
-- `image_file_id`
-- `template_vm_id`
-- `template_name`
-- `template_node_name`
-- `bootstrap_username`
+The current Terraform implementation in this root still performs cloud image download and template creation. That is transition-state drift from the accepted architecture and should be refactored toward Packer-produced template consumption rather than expanded further.
 
 ## Apply Order Dependency
 
-Apply after `terraform/live/prod/network` when templates should attach to a production VNet. Apply before `terraform/live/prod/workloads`.
+Apply after the Packer image build has produced an approved template artifact. Apply after `terraform/live/prod/network` when template attachment depends on platform networking. Apply before `terraform/live/prod/workloads`.
 
 ## Backend Migration
 

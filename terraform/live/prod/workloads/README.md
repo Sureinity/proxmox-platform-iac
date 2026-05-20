@@ -4,30 +4,29 @@
 
 This root module owns cloned production VMs only.
 
+Version 1 workload scope is:
+
+- admin or jump VM in the `mgmt` zone
+- Traefik reverse proxy VM in the `edge` zone
+- application VM in the `app` zone
+- PostgreSQL VM in the `data` zone
+
 It configures Proxmox VM lifecycle settings and cloud-init bootstrap access for Ansible handoff.
 
 ## Must Not Own
 
-This stack must not own SDN primitives, cloud image downloads, VM templates, guest package configuration, application deployment, or Ansible execution.
-
-## Required Variables
-
-- `proxmox_endpoint`
-- `proxmox_api_token`
-- `template_vm_id`
-- `default_node_name`
-- `default_bridge`
-- `cloud_init_datastore_id`
-- `bootstrap_username`
-- `bootstrap_ssh_public_keys`
-- `vms`
+This stack must not own Linux bridge fabric, the internal firewall VM, firewall policy, cloud image downloads, VM templates, guest package configuration, application deployment, or Ansible execution.
 
 ## Outputs
 
 - `vms`
-- `ansible_inventory_hosts`
+- `ansible_inventory`
 
-The `ansible_inventory_hosts` output is the source for generating `ansible/inventories/prod/hosts.yml`.
+The `ansible_inventory` output is the accepted Version 1 contract for generating `ansible/inventories/prod/hosts.yml`.
+
+## Current State Note
+
+The current Terraform implementation still assumes a single default bridge and still exposes `ansible_inventory_hosts` as a compatibility output. Both are implementation drift from the accepted multi-zone bridge-and-firewall contract and should be removed during the workload and handoff hardening phases.
 
 ## Apply Order Dependency
 
