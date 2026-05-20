@@ -45,6 +45,14 @@ packer/debian-13-base/output/debian-13-base-manifest.json
 
 That manifest is generated output and must not be committed. It is intended to provide template metadata for downstream Terraform consumption.
 
+The manifest custom metadata is expected to include:
+
+- `template_name`
+- `template_node_name`
+- `bootstrap_username`
+- `template_profile`
+- `build_id`
+
 ## Build Workflow
 
 ```bash

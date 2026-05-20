@@ -4,6 +4,7 @@
 
 This root module owns the Terraform-side image-factory integration boundary for production:
 
+- generated Packer manifest consumption
 - approved template metadata needed by downstream Terraform
 - non-secret template identity values passed to `workloads`
 - the clean lifecycle boundary between image construction and workload cloning
@@ -14,9 +15,19 @@ This stack must not own Linux bridge fabric, the internal firewall VM, cloned wo
 
 It also must not become the primary image builder. Packer owns image and template construction in Version 1.
 
-## Current State Note
+## Required Variables
 
-The current Terraform implementation in this root still performs cloud image download and template creation. That is transition-state drift from the accepted architecture and should be refactored toward Packer-produced template consumption rather than expanded further.
+- `packer_manifest_path`
+
+The default example path points at the generated Phase 2 Packer manifest. The manifest file itself is not committed and must exist locally before plans or applies can surface real template values.
+
+## Outputs
+
+- `template_contract`
+- `template_vm_id`
+- `template_name`
+- `template_node_name`
+- `bootstrap_username`
 
 ## Apply Order Dependency
 
