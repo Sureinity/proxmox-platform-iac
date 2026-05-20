@@ -20,16 +20,20 @@ output "ansible_inventory" {
   value = {
     all = {
       children = {
-        for group in toset([
-          for key, vm in module.vm : local.normalized_vms[key].ansible_group
-          if vm.ipv4_address != "dhcp"
-          ]) : group => {
-          hosts = {
-            for key, vm in module.vm : key => {
-              ansible_host = split("/", vm.ipv4_address)[0]
-              ansible_user = vm.bootstrap_username
+        linux = {
+          children = {
+            for group in toset([
+              for key, vm in module.vm : local.normalized_vms[key].ansible_group
+              if vm.ipv4_address != "dhcp"
+              ]) : group => {
+              hosts = {
+                for key, vm in module.vm : key => {
+                  ansible_host = split("/", vm.ipv4_address)[0]
+                  ansible_user = vm.bootstrap_username
+                }
+                if vm.ipv4_address != "dhcp" && local.normalized_vms[key].ansible_group == group
+              }
             }
-            if vm.ipv4_address != "dhcp" && local.normalized_vms[key].ansible_group == group
           }
         }
       }
