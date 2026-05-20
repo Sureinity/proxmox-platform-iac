@@ -1,0 +1,38 @@
+name: Packer
+
+on:
+  pull_request:
+    paths:
+      - "packer/**"
+      - ".github/workflows/packer.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "packer/**"
+      - ".github/workflows/packer.yml"
+
+jobs:
+  validate:
+    name: Format and validate
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: packer/debian-13-base
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Packer
+        uses: hashicorp/setup-packer@main
+
+      - name: Packer format
+        run: packer fmt -check .
+
+      - name: Packer init
+        run: packer init .
+
+      - name: Packer validate
+        run: packer validate -var-file=debian-13-base.pkrvars.hcl.example .
