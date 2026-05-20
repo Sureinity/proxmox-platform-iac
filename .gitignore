@@ -24,6 +24,7 @@ terraform.rc
 !*.pkrvars.hcl.example
 packer_cache/
 .packer_cache/
+packer/**/output/
 
 # Ansible local and secret artifacts
 *.retry
