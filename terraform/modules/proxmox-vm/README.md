@@ -38,10 +38,10 @@ module "vm" {
   node_name                = "pve01"
   vm_id                    = 110
   template_vm_id           = 100
-  bridge                   = "vnet1"
+  bridge                   = "vmbr30"
   cloud_init_datastore_id  = "local-lvm"
-  ipv4_address             = "10.0.50.110/24"
-  ipv4_gateway             = "10.0.50.1"
+  ipv4_address             = "10.0.3.10/24"
+  ipv4_gateway             = "10.0.3.1"
   bootstrap_username       = "debian"
   bootstrap_ssh_public_keys = var.bootstrap_ssh_public_keys
 }
