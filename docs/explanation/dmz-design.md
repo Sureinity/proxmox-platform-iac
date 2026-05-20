@@ -6,6 +6,8 @@ The `edge` zone is the platform DMZ. It contains public-facing ingress component
 
 In Version 1, the primary DMZ workload is the Traefik reverse proxy VM.
 
+Traffic reaches the DMZ through the internal OPNsense firewall VM, which is the routing and policy control point between upstream connectivity and internal platform zones.
+
 ## Trust Model
 
 The DMZ is semi-trusted.
@@ -23,7 +25,7 @@ The DMZ is therefore an exposure boundary, not a trusted control plane.
 
 The `edge` zone is intended to allow:
 
-- inbound client traffic from external networks to explicitly published reverse-proxy listeners
+- inbound client traffic from the upstream network to explicitly published reverse-proxy listeners, typically `80` and `443`
 - outbound proxy traffic from `edge` to `app` on approved backend service ports
 - restricted operator access from `mgmt` for administration, automation, and troubleshooting
 - response traffic for established connections
@@ -42,11 +44,14 @@ The `edge` zone is intended to deny:
 
 If a service in `edge` requires access beyond reverse-proxy behavior, that requirement must be documented and reviewed as a specific exception.
 
+Version 1 policy is deny by default outside the explicitly approved flows.
+
 ## Operational Consequences
 
 - Secrets required by internal services must not be staged in the DMZ unless they are strictly required by the reverse proxy role.
 - Platform operators should assume the `edge` zone has the highest exposure and the shortest acceptable mean time to rebuild.
 - Logging, access policy, and certificate handling for the DMZ should be treated as security-sensitive controls even in Version 1.
+- OPNsense logging should be treated as part of the DMZ security record because it is the primary enforcement and observation point for north-south and inter-zone policy.
 
 ## Version 1 and Version 2 Boundary
 

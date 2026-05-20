@@ -16,7 +16,7 @@ Each boundary has a different lifecycle, review cadence, and blast radius.
 
 | State | Responsibility | Change profile | Blast radius |
 | --- | --- | --- | --- |
-| `network` | Shared Proxmox SDN zones and routing boundaries | Low-frequency, highly reviewed | Platform-wide |
+| `network` | Linux bridge fabric, internal OPNsense firewall VM contract, gateway definitions, and traffic policy contract | Low-frequency, highly reviewed | Platform-wide |
 | `image-factory` | Template import and reusable image lifecycle | Periodic rebuilds and patch refreshes | Template consumers |
 | `workloads` | Cloned VMs and workload-specific infrastructure | Highest change rate | Individual platform workloads |
 
@@ -26,7 +26,7 @@ Without this split, routine workload changes would carry unnecessary risk to net
 
 ### `network`
 
-`network` changes should be rare and deliberate. They affect address plans, inter-zone policy, and every consumer of the platform.
+`network` changes should be rare and deliberate. They affect bridge topology, gateway ownership, inter-zone policy, and every consumer of the platform.
 
 ### `image-factory`
 
@@ -40,7 +40,7 @@ Without this split, routine workload changes would carry unnecessary risk to net
 
 The intended dependency flow is one-way:
 
-1. `network` establishes shared platform connectivity.
+1. `network` establishes shared platform connectivity and the internal firewall control-plane contract through OPNsense.
 2. `image-factory` establishes the reusable template baseline.
 3. `workloads` consumes the network contract and template contract.
 
@@ -51,6 +51,7 @@ The states should not be tightly coupled by hidden assumptions. Shared data pass
 The split exists to limit impact:
 
 - a workload change must not risk reapplying shared network resources
+- a workload change must not redefine bridge attachments, gateway conventions, or firewall policy assumptions
 - an image refresh must not risk deleting or renumbering workloads
 - a network change must be clearly visible as a cross-platform event
 
@@ -71,3 +72,5 @@ Backend configuration is intentionally not treated as an inline repository defau
 ## Implementation Note
 
 The repository already uses the three target root directories under `terraform/live/prod/`. Future implementation work must preserve these boundaries rather than collapsing them back into a single state.
+
+Version 1 network work must not introduce Proxmox SDN as a parallel mechanism. The accepted design is Proxmox Linux bridge fabric at L2 with OPNsense as the L3 and policy control plane.

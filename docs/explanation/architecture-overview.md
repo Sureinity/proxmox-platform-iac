@@ -4,10 +4,12 @@
 
 The platform is a secure multi-tier application platform on Proxmox. It provides a controlled network boundary model, an immutable image pipeline, infrastructure lifecycle management, and guest operating system configuration for the first production platform workloads.
 
-Version 1 is centered on three workload VMs:
+Version 1 includes the internal firewall control plane and four core guest VMs:
 
+- OPNsense internal firewall VM as the routing and policy control plane
+- operator-facing admin or jump VM in the `mgmt` zone
 - Traefik reverse proxy in the `edge` zone
-- Application VM in the `app` zone
+- application VM in the `app` zone
 - PostgreSQL VM in the `data` zone
 
 A monitoring VM is a planned extension and is not part of Version 1 delivery.
@@ -16,7 +18,8 @@ A monitoring VM is a planned extension and is not part of Version 1 delivery.
 
 The platform includes:
 
-- Proxmox SDN networking for `mgmt`, `edge`, `app`, and `data`
+- Proxmox Linux bridge fabric for `mgmt`, `edge`, `app`, and `data`
+- internal OPNsense firewall control plane for routing, policy, and gateway ownership
 - Packer-based image creation for reusable guest templates
 - Terraform state layers for network, image factory, and workloads
 - Cloud-init for first-boot identity and network bootstrap
@@ -34,15 +37,30 @@ The platform excludes from Version 1:
 
 ### Packer Image Factory
 
-Packer owns immutable image construction. It produces the base image artifact and template inputs that the rest of the platform consumes. It must not own environment-specific networking, runtime secrets, or service-specific configuration.
+Packer owns immutable image and template construction. It produces the approved Proxmox template artifact and metadata that the rest of the platform consumes. It must not own environment-specific networking, runtime secrets, or service-specific configuration.
 
 ### Terraform Network State
 
-The `network` state owns shared Proxmox networking primitives. It defines the four-zone segmentation model and the routing or policy boundaries that other platform layers depend on.
+The `network` state owns the shared Proxmox Linux bridge fabric and the internal firewall control-plane contract. It defines bridge attachments, zone gateway definitions, and the policy contract that downstream platform layers depend on.
+
+### OPNsense Control Plane
+
+OPNsense is the Version 1 L3 and policy control plane.
+
+It owns:
+
+- zone gateway IPs
+- inter-zone routing
+- firewall policy
+- logging
+- DHCP only where explicitly needed
+- NAT only where explicitly needed
+
+Proxmox does not own those L3 or policy functions in Version 1. Proxmox provides only the virtual switching and attachment fabric.
 
 ### Terraform Image Factory State
 
-The `image-factory` state imports Packer output into Proxmox and creates reusable VM templates. It exists to separate template lifecycle from both networking and workload provisioning.
+The `image-factory` state is the Terraform-side integration boundary for approved Packer outputs. It exists to separate template contract management from both networking and workload provisioning. It must not become a second image builder.
 
 ### Terraform Workloads State
 
@@ -76,18 +94,23 @@ Ansible begins only after Terraform has created reachable VMs with the expected 
 
 The platform operating flow is:
 
-1. Packer builds the reusable guest template input.
-2. Terraform provisions the network layer.
-3. Terraform provisions the workload layer, using the image-factory outputs as template inputs.
-4. Cloud-init bootstraps instance identity and networking on first boot.
-5. Ansible configures the guest OS and workload services.
+1. Packer builds the reusable Debian template artifact.
+2. Terraform provisions the network layer, including Linux bridge fabric and the internal OPNsense control-plane contract.
+3. Terraform `image-factory` publishes or consumes the approved template contract needed by downstream Terraform.
+4. Terraform provisions the workload layer, using that template contract as input.
+5. Cloud-init bootstraps instance identity and networking on first boot, using static IP assignment as the default for core Linux VMs.
+6. Ansible configures the guest OS and workload services.
 
-In practice, the image-factory state sits between steps 1 and 3. Packer builds the image, and Terraform `image-factory` turns that image into a Proxmox template before the `workloads` state clones VMs from it.
+Current implementation note: some Terraform in `terraform/live/prod/image-factory/` still reflects pre-Packer-transition template construction. Treat that as implementation drift to remove, not as the accepted platform boundary.
 
 ## Design Constraints
 
 - The `edge` zone is the DMZ and is semi-trusted, not trusted.
+- Proxmox Linux bridges provide L2 transport only in Version 1.
+- OPNsense owns zone gateways, routing, policy, and optional DHCP or NAT behavior.
 - Version 1 ingress is reverse proxy only.
+- Static addressing via cloud-init is the default for core infrastructure and workload VMs.
+- DHCP is optional and, when used, is owned by OPNsense rather than a separate Linux DHCP VM.
 - Version 1 secrets use environment variables and committed `.tfvars.example` files only.
 - The only real environment layout is `terraform/live/prod/`.
 - CI validates formatting, syntax, and configuration safety, but does not apply infrastructure.
