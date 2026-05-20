@@ -42,7 +42,7 @@ The `ansible_inventory` output is the accepted Version 1 contract for generating
 
 ## Current State Note
 
-The current Terraform implementation now derives bridge and gateway placement from the zone contract. The remaining compatibility output is `ansible_inventory_hosts`, which should be retired during the handoff hardening phase.
+The current Terraform implementation derives bridge and gateway placement from the zone contract and publishes the final `ansible_inventory` handoff output for the local generator script.
 
 ## Apply Order Dependency
 

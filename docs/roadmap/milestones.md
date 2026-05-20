@@ -38,4 +38,4 @@ Pull requests receive validation-only checks for Packer, Terraform, Ansible, and
 ## M8: Inventory Handoff Hardening
 
 Outcome:
-Terraform outputs and Ansible inventory generation are consistent, documented, and suitable for repeatable operator use.
+Terraform outputs and the repo-local Ansible inventory generator are consistent, documented, and suitable for repeatable operator use.

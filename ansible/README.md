@@ -6,8 +6,6 @@ Ansible configures guest operating systems after Terraform creates reachable VMs
 
 Version 1 standardizes on Terraform output `ansible_inventory` as the inventory handoff contract for generating a local inventory from `inventories/prod/hosts.yml.example`.
 
-If local Terraform still exposes `ansible_inventory_hosts`, treat that as compatibility output during the handoff transition rather than the target contract.
-
 The expected inventory shape is:
 
 - top-level `all`
@@ -17,6 +15,12 @@ The expected inventory shape is:
 The internal OPNsense firewall VM is excluded from this baseline inventory unless appliance automation is introduced as a separate decision.
 
 Do not commit `hosts.yml`, private keys, vault files, passwords, or machine-specific group variable files.
+
+Generate the local inventory with:
+
+```bash
+python3 ansible/scripts/generate_inventory.py
+```
 
 ## Baseline Role
 

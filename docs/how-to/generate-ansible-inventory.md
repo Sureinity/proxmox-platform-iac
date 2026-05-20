@@ -4,7 +4,7 @@
 
 Use Terraform workload outputs to derive the Version 1 Ansible inventory.
 
-This document describes the intended contract. It does not claim that the final helper command or output implementation already exists.
+This document describes the implemented Version 1 handoff contract and the repo-local command that renders it.
 
 ## Version 1 Contract
 
@@ -14,29 +14,32 @@ That output should contain the data needed to render `ansible/inventories/prod/h
 
 ## Expected Workflow
 
-The intended operator flow is:
+The operator flow is:
 
 1. Apply the `workloads` state.
-2. Read the `ansible_inventory` Terraform output.
-3. Render that output into `ansible/inventories/prod/hosts.yml`.
+2. Run the repository inventory generator.
+3. Review the generated `ansible/inventories/prod/hosts.yml`.
 4. Run Ansible against the generated inventory.
 
-## Placeholder Command Pattern
+## Generation Command
 
-Until a repo-local helper command is implemented, use this as the target command pattern:
+Use:
+
+```bash
+python3 ansible/scripts/generate_inventory.py
+```
+
+The script shells out to:
 
 ```bash
 terraform -chdir=terraform/live/prod/workloads output -json ansible_inventory
 ```
 
-One acceptable future implementation is a wrapper that renders the JSON contract directly to YAML, for example:
+and writes the rendered inventory to:
 
-```bash
-terraform -chdir=terraform/live/prod/workloads output -json ansible_inventory \
-  | <renderer> > ansible/inventories/prod/hosts.yml
+```text
+ansible/inventories/prod/hosts.yml
 ```
-
-`<renderer>` is intentionally a placeholder. It may become a small repository script, a Make target, or a documented `jq` and `yq` pipeline during the inventory hardening phase.
 
 ## Expected Data Shape
 
@@ -72,7 +75,3 @@ all:
 The exact host addresses above are illustrative. The stable part of the contract is the output name, grouping model, and renderable structure.
 
 The internal OPNsense firewall VM is not assumed to be part of this general Linux guest inventory contract unless a separate appliance-management decision is made.
-
-## Current State Note
-
-If the current implementation exposes a different output name or shape, treat that as implementation drift to be corrected during the workload and handoff phases. The accepted Version 1 contract remains `ansible_inventory`.

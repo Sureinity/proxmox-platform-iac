@@ -283,7 +283,7 @@ Stabilize the Terraform-to-Ansible inventory handoff so it is repeatable, docume
 **Key outputs and artifacts**
 
 - final Terraform inventory output contract
-- documented or automated inventory generation flow
+- documented and automated inventory generation flow
 - updated inventory examples and handoff docs
 
 **Dependencies**
@@ -295,6 +295,7 @@ Stabilize the Terraform-to-Ansible inventory handoff so it is repeatable, docume
 **Exit criteria**
 
 - a documented generation path exists from Terraform output to `ansible/inventories/prod/hosts.yml`
+- a repo-local generator command renders the inventory without hand-editing host entries
 - the inventory contract is stable and matches the naming conventions
 - downstream playbooks can assume a consistent group structure
 
