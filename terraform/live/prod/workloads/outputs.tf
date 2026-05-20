@@ -40,15 +40,3 @@ output "ansible_inventory" {
     }
   }
 }
-
-output "ansible_inventory_hosts" {
-  description = "Legacy compatibility host map derived from workload VM definitions."
-  value = {
-    for key, vm in module.vm : key => {
-      ansible_host = split("/", vm.ipv4_address)[0]
-      ansible_user = vm.bootstrap_username
-      groups       = [local.normalized_vms[key].ansible_group]
-    }
-    if vm.ipv4_address != "dhcp"
-  }
-}
