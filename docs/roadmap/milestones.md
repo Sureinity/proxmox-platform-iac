@@ -33,7 +33,7 @@ Ansible configures the guest baseline and begins the service configuration path 
 ## M7: Validation CI
 
 Outcome:
-Pull requests receive validation-only checks for Terraform, Ansible, and static configuration security.
+Pull requests receive validation-only checks for Packer, Terraform, Ansible, and static configuration security.
 
 ## M8: Inventory Handoff Hardening
 

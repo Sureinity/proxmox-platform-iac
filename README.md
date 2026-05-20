@@ -72,7 +72,7 @@ Run Terraform first, then generate or update a local Ansible inventory from the 
 
 ## CI Checks
 
-CI validates Terraform formatting and root-module configuration, Ansible syntax, YAML syntax, and static security checks without requiring live Proxmox credentials.
+CI validates Packer formatting and template validation, Terraform formatting and root-module configuration, Ansible syntax, YAML syntax, and static security checks without requiring live Proxmox credentials.
 
 Pull request checks intentionally use backend-disabled Terraform initialization and example Ansible inventory files. Authenticated plans and applies belong in protected deployment workflows with environment approvals.
 

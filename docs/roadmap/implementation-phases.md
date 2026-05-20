@@ -239,12 +239,14 @@ Add validation-only automation that continuously checks repository quality witho
 
 **Scope**
 
+- Packer format and validation workflow
 - GitHub Actions for Terraform validation
 - GitHub Actions for Ansible syntax and lint checks
 - static configuration security checks
 
 **Key outputs and artifacts**
 
+- `.github/workflows/packer.yml`
 - `.github/workflows/terraform.yml`
 - `.github/workflows/ansible.yml`
 - `.github/workflows/security.yml`
@@ -257,7 +259,7 @@ Add validation-only automation that continuously checks repository quality witho
 **Exit criteria**
 
 - pull requests can run validation without live Proxmox credentials
-- CI covers formatting, validation, syntax, and selected static security checks
+- CI covers Packer, Terraform, Ansible, syntax, and selected static security checks
 - no CI job performs live apply or mutable deployment actions in Version 1
 
 **Risks**
