@@ -17,6 +17,22 @@ It configures Proxmox VM lifecycle settings and cloud-init bootstrap access for 
 
 This stack must not own Linux bridge fabric, the internal firewall VM, firewall policy, cloud image downloads, VM templates, guest package configuration, application deployment, or Ansible execution.
 
+## Required Variables
+
+- `proxmox_endpoint`
+- `proxmox_api_token`
+- `template_contract`
+- `zone_bridges`
+- `zone_gateways`
+- `bootstrap_ssh_public_keys`
+- `vms`
+
+Optional variables cover:
+
+- default node override
+- cloud-init datastore override
+- DNS servers
+
 ## Outputs
 
 - `vms`
@@ -26,7 +42,7 @@ The `ansible_inventory` output is the accepted Version 1 contract for generating
 
 ## Current State Note
 
-The current Terraform implementation still assumes a single default bridge and still exposes `ansible_inventory_hosts` as a compatibility output. Both are implementation drift from the accepted multi-zone bridge-and-firewall contract and should be removed during the workload and handoff hardening phases.
+The current Terraform implementation now derives bridge and gateway placement from the zone contract. The remaining compatibility output is `ansible_inventory_hosts`, which should be retired during the handoff hardening phase.
 
 ## Apply Order Dependency
 

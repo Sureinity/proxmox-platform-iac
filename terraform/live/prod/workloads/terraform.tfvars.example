@@ -2,11 +2,29 @@ proxmox_endpoint     = "https://pve.example.com:8006/"
 proxmox_api_token    = "user@realm!token-id=REPLACE_WITH_TOKEN_SECRET"
 proxmox_insecure_tls = false
 
-template_vm_id          = 100
-default_node_name       = "pve01"
-default_bridge          = "vnet1"
-cloud_init_datastore_id = "local-lvm"
-bootstrap_username      = "debian"
+template_contract = {
+  template_vm_id     = 100
+  template_name      = "tmpl-debian-13-base-20260520"
+  template_node_name = "pve01"
+  bootstrap_username = "debian"
+  cloud_init_storage = "local-lvm"
+}
+
+default_node_name = "pve01"
+
+zone_bridges = {
+  mgmt = "vmbr10"
+  edge = "vmbr20"
+  app  = "vmbr30"
+  data = "vmbr40"
+}
+
+zone_gateways = {
+  mgmt = "10.0.1.1/24"
+  edge = "10.0.2.1/24"
+  app  = "10.0.3.1/24"
+  data = "10.0.4.1/24"
+}
 
 bootstrap_ssh_public_keys = [
   "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIExamplePublicKeyOnly operator@example",
@@ -15,23 +33,43 @@ bootstrap_ssh_public_keys = [
 dns_servers = ["1.1.1.1", "8.8.8.8"]
 
 vms = {
-  portfolio_next_js = {
-    name          = "portfolio-next-js"
+  prod_admin_01 = {
+    name          = "prod-admin-01"
     vm_id         = 110
-    ipv4_address  = "10.0.50.110/24"
-    ipv4_gateway  = "10.0.50.1"
+    zone          = "mgmt"
+    ipv4_address  = "10.0.1.10/24"
     cpu_cores     = 2
     memory_mb     = 2048
-    ansible_group = "debian_trixie"
+    ansible_group = "mgmt_nodes"
   }
 
-  traefik_proxy = {
-    name          = "traefik-proxy"
+  prod_traefik_01 = {
+    name          = "prod-traefik-01"
     vm_id         = 111
-    ipv4_address  = "10.0.50.111/24"
-    ipv4_gateway  = "10.0.50.1"
+    zone          = "edge"
+    ipv4_address  = "10.0.2.10/24"
     cpu_cores     = 2
     memory_mb     = 2048
-    ansible_group = "debian_trixie"
+    ansible_group = "edge_proxies"
+  }
+
+  prod_app_01 = {
+    name          = "prod-app-01"
+    vm_id         = 112
+    zone          = "app"
+    ipv4_address  = "10.0.3.10/24"
+    cpu_cores     = 2
+    memory_mb     = 2048
+    ansible_group = "app_nodes"
+  }
+
+  prod_postgres_01 = {
+    name          = "prod-postgres-01"
+    vm_id         = 113
+    zone          = "data"
+    ipv4_address  = "10.0.4.10/24"
+    cpu_cores     = 2
+    memory_mb     = 4096
+    ansible_group = "postgresql_nodes"
   }
 }
