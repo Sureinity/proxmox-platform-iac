@@ -45,26 +45,28 @@ The target output should be renderable into a standard Ansible inventory shape s
 ```yaml
 all:
   children:
-    mgmt_nodes:
-      hosts:
-        prod-admin-01:
-          ansible_host: 10.0.1.10
-          ansible_user: platform
-    edge_proxies:
-      hosts:
-        prod-traefik-01:
-          ansible_host: 10.0.2.10
-          ansible_user: platform
-    app_nodes:
-      hosts:
-        prod-app-01:
-          ansible_host: 10.0.3.10
-          ansible_user: platform
-    postgresql_nodes:
-      hosts:
-        prod-postgres-01:
-          ansible_host: 10.0.4.10
-          ansible_user: platform
+    linux:
+      children:
+        mgmt_nodes:
+          hosts:
+            prod-admin-01:
+              ansible_host: 10.0.1.10
+              ansible_user: platform
+        edge_proxies:
+          hosts:
+            prod-traefik-01:
+              ansible_host: 10.0.2.10
+              ansible_user: platform
+        app_nodes:
+          hosts:
+            prod-app-01:
+              ansible_host: 10.0.3.10
+              ansible_user: platform
+        postgresql_nodes:
+          hosts:
+            prod-postgres-01:
+              ansible_host: 10.0.4.10
+              ansible_user: platform
 ```
 
 The exact host addresses above are illustrative. The stable part of the contract is the output name, grouping model, and renderable structure.
