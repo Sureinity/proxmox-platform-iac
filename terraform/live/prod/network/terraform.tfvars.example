@@ -2,16 +2,46 @@ proxmox_endpoint     = "https://pve.example.com:8006/"
 proxmox_api_token    = "user@realm!token-id=REPLACE_WITH_TOKEN_SECRET"
 proxmox_insecure_tls = false
 
-zone_id    = "net1"
-vnet_id    = "vnet1"
-node_names = ["pve01"]
+node_name = "pve01"
 
-subnet_cidr = "10.0.50.0/24"
-gateway     = "10.0.50.1"
-
-dhcp_range = {
-  start_address = "10.0.50.100"
-  end_address   = "10.0.50.150"
+bridge_fabric = {
+  upstream = {
+    name    = "vmbr0"
+    comment = "Upstream transit or WAN bridge"
+    ports   = ["eno1"]
+  }
+  mgmt = {
+    name    = "vmbr10"
+    comment = "Management bridge"
+  }
+  edge = {
+    name    = "vmbr20"
+    comment = "DMZ ingress bridge"
+  }
+  app = {
+    name    = "vmbr30"
+    comment = "Application bridge"
+  }
+  data = {
+    name    = "vmbr40"
+    comment = "Data bridge"
+  }
 }
 
-enable_snat = true
+zone_gateways = {
+  mgmt = "10.0.1.1/24"
+  edge = "10.0.2.1/24"
+  app  = "10.0.3.1/24"
+  data = "10.0.4.1/24"
+}
+
+opnsense_name           = "prod-opnsense-01"
+opnsense_vm_id          = 150
+opnsense_template_vm_id = 9000
+opnsense_cpu_cores      = 2
+opnsense_memory_mb      = 4096
+opnsense_started        = true
+opnsense_on_boot        = true
+
+opnsense_dhcp_zones = []
+opnsense_nat_enabled = false
