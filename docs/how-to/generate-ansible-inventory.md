@@ -45,6 +45,11 @@ The target output should be renderable into a standard Ansible inventory shape s
 ```yaml
 all:
   children:
+    mgmt_nodes:
+      hosts:
+        prod-admin-01:
+          ansible_host: 10.0.1.10
+          ansible_user: platform
     edge_proxies:
       hosts:
         prod-traefik-01:
@@ -63,6 +68,8 @@ all:
 ```
 
 The exact host addresses above are illustrative. The stable part of the contract is the output name, grouping model, and renderable structure.
+
+The internal OPNsense firewall VM is not assumed to be part of this general Linux guest inventory contract unless a separate appliance-management decision is made.
 
 ## Current State Note
 

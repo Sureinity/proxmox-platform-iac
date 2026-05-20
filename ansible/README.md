@@ -4,7 +4,9 @@ Ansible configures guest operating systems after Terraform creates reachable VMs
 
 ## Inventory
 
-Use `terraform/live/prod/workloads` output `ansible_inventory_hosts` to generate a local inventory from `inventories/prod/hosts.yml.example`.
+Version 1 standardizes on Terraform output `ansible_inventory` as the inventory handoff contract for generating a local inventory from `inventories/prod/hosts.yml.example`.
+
+If local Terraform still exposes `ansible_inventory_hosts`, treat that as compatibility output during the handoff transition rather than the target contract.
 
 Do not commit `hosts.yml`, private keys, vault files, passwords, or machine-specific group variable files.
 
