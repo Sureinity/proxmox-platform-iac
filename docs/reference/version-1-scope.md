@@ -6,13 +6,16 @@ Version 1 includes the core platform contracts and first delivery surface:
 
 - secure multi-tier application platform pattern
 - four-zone network model: `mgmt`, `edge`, `app`, `data`
+- Proxmox Linux bridge fabric using `vmbr0`, `vmbr10`, `vmbr20`, `vmbr30`, and `vmbr40`
+- internal OPNsense firewall VM as the Version 1 routing and policy control plane
 - `terraform/live/prod/` as the only real environment
 - Terraform state split into `network`, `image-factory`, and `workloads`
 - capability-based Terraform module strategy
 - Packer image factory as the selected image strategy
 - cloud-init for hostname, SSH user, SSH keys, and network only
 - Ansible for guest OS and service configuration
-- three workload VMs: Traefik proxy, application, and PostgreSQL
+- static IP assignment via cloud-init as the default for core Linux VMs
+- workload and operator-facing VMs: admin or jump VM, Traefik proxy, application, and PostgreSQL
 - reverse proxy ingress only
 - environment-variable secret injection with committed `.tfvars.example`
 - Terraform `ansible_inventory` output as the Version 1 inventory contract
@@ -26,6 +29,16 @@ The following items are intentionally deferred:
 - SOPS-managed encrypted secret files
 - dynamic Ansible inventory
 - monitoring VM as a separate workload
+- separate Linux DHCP VM
+
+## Version 1 Network Mechanism
+
+Version 1 does not use Proxmox SDN.
+
+Version 1 uses:
+
+- Proxmox Linux bridges for L2 transport
+- OPNsense for gateways, routing, policy, logging, and any explicitly required DHCP or NAT behavior
 
 ## What Deferred Means
 

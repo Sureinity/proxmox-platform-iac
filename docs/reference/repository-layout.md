@@ -17,8 +17,8 @@ docs/
 | Area | Owns | Must not own |
 | --- | --- | --- |
 | `packer/` | Image build definitions, template build inputs, image versioning metadata | Environment-specific networking, live VM lifecycle, guest runtime configuration |
-| `terraform/` | Proxmox infrastructure lifecycle, shared networking, template integration, workload VM provisioning | Guest package installation, service configuration, ad hoc bootstrap scripts that duplicate Ansible |
-| `ansible/` | Guest OS baseline, users, SSH hardening, runtimes, workload service configuration, monitoring hooks | VM creation, Proxmox SDN resources, template creation, secret storage in plaintext |
+| `terraform/` | Proxmox infrastructure lifecycle, Linux bridge fabric, internal firewall VM contract, template integration, workload VM provisioning | Guest package installation, service configuration, ad hoc bootstrap scripts that duplicate Ansible |
+| `ansible/` | Guest OS baseline, users, SSH hardening, runtimes, workload service configuration, monitoring hooks | VM creation, Linux bridge fabric, OPNsense routing or firewall policy control, template creation, secret storage in plaintext |
 | `.github/` | Validation-only CI workflows and repository automation | Direct infrastructure apply workflows in Version 1, embedded long-lived credentials |
 | `docs/` | Diataxis documentation, ADRs, roadmap, project contracts | Implementation logic, generated runtime state, operator secrets |
 
@@ -42,6 +42,7 @@ Rules:
 - `modules/` contains reusable capability modules only
 - `live/prod/` contains the only real environment
 - root modules under `live/prod/` map directly to the accepted state boundaries
+- the `network` root owns Linux bridge fabric and the internal firewall control-plane contract
 
 ## Packer Layout Contract
 

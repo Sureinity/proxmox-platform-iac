@@ -17,6 +17,8 @@ prod-<role>-<index>
 
 Examples:
 
+- `prod-opnsense-01`
+- `prod-admin-01`
 - `prod-traefik-01`
 - `prod-app-01`
 - `prod-postgres-01`
@@ -64,7 +66,7 @@ Terraform module directories must be capability-based and lowercase hyphen-separ
 
 Examples:
 
-- `proxmox-sdn`
+- `proxmox-linux-bridge`
 - `proxmox-cloud-image`
 - `proxmox-template`
 - `proxmox-vm`
@@ -108,6 +110,7 @@ Inventory groups must use `snake_case` and represent operational roles, not ad h
 
 Preferred Version 1 groups:
 
+- `mgmt_nodes`
 - `edge_proxies`
 - `app_nodes`
 - `postgresql_nodes`
