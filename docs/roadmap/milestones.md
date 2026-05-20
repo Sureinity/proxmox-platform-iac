@@ -13,7 +13,7 @@ An immutable image pipeline exists and produces the approved base artifact for P
 ## M3: Network Layer
 
 Outcome:
-The `network` state implements the four-zone segmentation model and shared connectivity contract.
+The `network` state implements the Linux bridge fabric, internal OPNsense control plane, zone gateways, and the four-zone traffic policy contract.
 
 ## M4: Image-Factory Integration
 
@@ -23,7 +23,7 @@ Terraform can import the approved image artifact into Proxmox and create a reusa
 ## M5: Workload Provisioning
 
 Outcome:
-Terraform provisions the Traefik, application, and PostgreSQL VMs and publishes the inventory handoff contract.
+Terraform provisions the admin, Traefik, application, and PostgreSQL VMs against the established network control plane and publishes the inventory handoff contract.
 
 ## M6: Ansible Baseline
 

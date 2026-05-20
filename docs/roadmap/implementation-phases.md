@@ -82,14 +82,19 @@ Implement the four-zone network contract in the `network` state.
 **Scope**
 
 - `terraform/live/prod/network`
-- capability modules required for zone and subnet provisioning
-- `mgmt`, `edge`, `app`, and `data` addressing and routing contracts
+- capability modules required for Linux bridge fabric and internal firewall VM lifecycle
+- `vmbr0`, `vmbr10`, `vmbr20`, `vmbr30`, and `vmbr40` bridge contracts
+- `mgmt`, `edge`, `app`, and `data` addressing, gateway, and policy contracts
+- internal OPNsense firewall introduction, interface placement, and zone gateway definition
+- traffic policy definition and validation
 - network outputs required by downstream workload placement
 
 **Key outputs and artifacts**
 
 - network root module implementation
 - network capability module implementation
+- internal firewall VM contract
+- reviewed bridge, gateway, and policy contract outputs
 - reviewed outputs for downstream consumers
 - documentation updates if enforcement details become concrete
 
@@ -99,13 +104,17 @@ Implement the four-zone network contract in the `network` state.
 
 **Exit criteria**
 
-- the four accepted subnets exist in the network layer
+- the accepted bridge fabric exists for upstream, `mgmt`, `edge`, `app`, and `data`
+- the internal OPNsense control plane is defined as the owner of zone gateways and traffic policy
 - the zone contract matches the documented traffic model
+- the default deny posture and approved flows are documented and validated
 - no workload-specific configuration is embedded in the network state
 
 **Risks**
 
 - network implementation may diverge from the documented trust model
+- bridge topology decisions can drift from the accepted contract
+- firewall policy may become implicit instead of reviewable
 - shared-network changes carry platform-wide blast radius
 
 ## Phase 4: Terraform Image-Factory Layer Integration
@@ -130,7 +139,7 @@ Connect the Packer image pipeline to the Proxmox template lifecycle through the 
 **Dependencies**
 
 - Phase 2
-- Phase 3 for any network attachment assumptions used by template creation
+- Phase 3 for bridge attachment assumptions and any OPNsense-controlled reachability expectations used during template validation
 
 **Exit criteria**
 
@@ -152,6 +161,7 @@ Provision the Version 1 workload VMs and publish the Terraform-to-Ansible handof
 **Scope**
 
 - `terraform/live/prod/workloads`
+- admin or jump VM in the `mgmt` zone
 - Traefik proxy VM
 - application VM
 - PostgreSQL VM
@@ -160,18 +170,19 @@ Provision the Version 1 workload VMs and publish the Terraform-to-Ansible handof
 **Key outputs and artifacts**
 
 - workload root module implementation
-- VM definitions for the three Version 1 workloads
+- VM definitions for the Version 1 admin, proxy, application, and PostgreSQL hosts
 - stable `ansible_inventory` Terraform output
 
 **Dependencies**
 
-- Phase 3
+- Phase 3, with the network control plane, bridge fabric, and zone gateways already established
 - Phase 4
 
 **Exit criteria**
 
-- the three Version 1 VMs can be provisioned from the approved template flow
-- host identity, SSH user, SSH keys, and networking are provided through cloud-init only
+- the Version 1 Linux VMs can be provisioned from the approved template flow
+- workloads attach to the correct bridge fabric and use the documented OPNsense gateways
+- host identity, SSH user, SSH keys, and static networking are provided through cloud-init only
 - Terraform does not run Ansible or embed guest configuration logic
 - the `ansible_inventory` output is stable enough for downstream consumption
 
@@ -179,7 +190,7 @@ Provision the Version 1 workload VMs and publish the Terraform-to-Ansible handof
 
 - workload code can leak service configuration into Terraform
 - unstable output names can break the Ansible handoff
-- incorrect network placement can violate the trust model
+- incorrect bridge attachment or gateway selection can violate the trust model
 
 ## Phase 6: Ansible Baseline Configuration
 
