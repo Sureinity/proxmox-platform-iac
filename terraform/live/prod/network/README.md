@@ -17,9 +17,29 @@ This root module owns the production Linux bridge fabric and internal firewall c
 
 This stack must not create cloud images, VM templates, cloned workload VMs, or guest OS configuration.
 
-## Current State Note
+## Required Variables
 
-The accepted Version 1 design for this root is the four-zone bridge-and-firewall model above. The current Terraform implementation still reflects SDN-oriented, single-zone assumptions and must be realigned rather than extended as if that older shape were the target.
+- `proxmox_endpoint`
+- `proxmox_api_token`
+- `node_name`
+- `bridge_fabric`
+- `opnsense_vm_id`
+- `opnsense_template_vm_id`
+
+Optional variables cover:
+
+- fixed `zone_gateways`
+- OPNsense CPU and memory sizing
+- explicit DHCP zone ownership
+- explicit NAT requirement
+
+## Outputs
+
+- `bridges`
+- `zone_bridges`
+- `zone_gateways`
+- `opnsense_vm`
+- `traffic_policy_contract`
 
 ## Apply Order Dependency
 
