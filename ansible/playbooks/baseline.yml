@@ -1,6 +1,6 @@
 ---
 - name: Configure Debian baseline
-  hosts: debian_trixie
+  hosts: linux
   gather_facts: true
   become: true
 

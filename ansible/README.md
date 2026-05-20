@@ -8,6 +8,14 @@ Version 1 standardizes on Terraform output `ansible_inventory` as the inventory 
 
 If local Terraform still exposes `ansible_inventory_hosts`, treat that as compatibility output during the handoff transition rather than the target contract.
 
+The expected inventory shape is:
+
+- top-level `all`
+- umbrella group `linux`
+- child groups `mgmt_nodes`, `edge_proxies`, `app_nodes`, and `postgresql_nodes`
+
+The internal OPNsense firewall VM is excluded from this baseline inventory unless appliance automation is introduced as a separate decision.
+
 Do not commit `hosts.yml`, private keys, vault files, passwords, or machine-specific group variable files.
 
 ## Baseline Role

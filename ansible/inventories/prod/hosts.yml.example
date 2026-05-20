@@ -1,11 +1,25 @@
 ---
 all:
   children:
-    debian_trixie:
-      hosts:
-        portfolio_next_js:
-          ansible_host: 10.0.50.110
-        traefik_proxy:
-          ansible_host: 10.0.50.111
-      vars:
-        ansible_user: debian
+    linux:
+      children:
+        mgmt_nodes:
+          hosts:
+            prod-admin-01:
+              ansible_host: 10.0.1.10
+              ansible_user: debian
+        edge_proxies:
+          hosts:
+            prod-traefik-01:
+              ansible_host: 10.0.2.10
+              ansible_user: debian
+        app_nodes:
+          hosts:
+            prod-app-01:
+              ansible_host: 10.0.3.10
+              ansible_user: debian
+        postgresql_nodes:
+          hosts:
+            prod-postgres-01:
+              ansible_host: 10.0.4.10
+              ansible_user: debian
