@@ -1,21 +1,25 @@
-# Proxmox Platform IaC
+# Proxmox Platform Infrastructure as Code
 
-Enterprise-grade infrastructure-as-code reference for running Proxmox platform components with Terraform and Ansible.
+Production-style infrastructure-as-code repository for a secure multi-tier private cloud platform on Proxmox using Packer, Terraform, Ansible, and GitHub Actions.
 
-The repository is being shaped into a secure multi-tier application platform on Proxmox. It preserves the core project intent of segmented networking, reusable image and template handling, cloned VM provisioning, and guest baseline configuration.
+The repository is organized around explicit lifecycle boundaries:
+
+- Packer owns reusable Debian image and template construction.
+- Terraform owns Proxmox Linux bridge fabric, internal firewall VM lifecycle, image-factory integration, and workload VM lifecycle.
+- Ansible owns post-boot guest operating system and service configuration.
 
 Repository policy forbids committed state files, real `.tfvars`, private keys, plaintext secrets, and similar local artifacts. Implementation cleanup and enforcement must continue to align the working tree with that policy.
 
 This repository is intentionally split by responsibility:
 
-- Terraform owns Proxmox infrastructure lifecycle: SDN, cloud image downloads, VM templates, and cloned VMs.
+- Terraform owns Proxmox infrastructure lifecycle: Linux bridge fabric, internal firewall VM contract, image-factory integration, and cloned workload VMs.
 - Ansible owns guest operating system configuration after Terraform has created reachable machines.
 - Documentation records state boundaries, secret injection, operating order, and handoff expectations.
 
 ## Repository Layout
 
 ```text
-packer/                     # Planned image build pipeline
+packer/                     # Image factory boundary and Packer definitions
 terraform/
   modules/                 # Reusable Terraform modules
   live/prod/               # Production state boundaries
@@ -43,10 +47,11 @@ Terraform root modules do not call each other directly. Operators pass required 
 
 Apply order is intentionally explicit:
 
-1. Network stack creates Proxmox SDN primitives.
-2. Image factory downloads the cloud image and creates VM templates.
-3. Workloads clone VMs from templates and publish Ansible-ready outputs.
-4. Ansible consumes Terraform outputs or a generated inventory and configures guest operating systems.
+1. Packer builds the approved Debian-based Proxmox template artifact.
+2. Terraform `network` establishes the shared Proxmox Linux bridge fabric and the internal OPNsense control-plane contract.
+3. Terraform `image-factory` consumes the approved template contract needed by downstream Terraform.
+4. Terraform `workloads` clones VMs from the approved template and publishes Ansible-ready outputs.
+5. Ansible consumes Terraform outputs or a generated inventory and configures guest operating systems.
 
 ## Secret Injection
 
