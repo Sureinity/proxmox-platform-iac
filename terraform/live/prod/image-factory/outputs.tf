@@ -1,24 +1,24 @@
-output "image_file_id" {
-  description = "Proxmox file ID for the downloaded Debian cloud image."
-  value       = module.debian_image.file_id
+output "template_contract" {
+  description = "Approved template identity contract consumed by downstream Terraform."
+  value       = local.template_contract
 }
 
 output "template_vm_id" {
-  description = "Proxmox VM ID for the Debian template."
-  value       = module.debian_template.template_vm_id
+  description = "Proxmox VM ID of the approved template artifact."
+  value       = local.template_contract.template_vm_id
 }
 
 output "template_name" {
-  description = "Debian template name."
-  value       = module.debian_template.template_name
+  description = "Approved template name."
+  value       = local.template_contract.template_name
 }
 
 output "template_node_name" {
-  description = "Node where the Debian template exists."
-  value       = module.debian_template.node_name
+  description = "Node where the approved template exists."
+  value       = local.template_contract.template_node_name
 }
 
 output "bootstrap_username" {
-  description = "Cloud-init bootstrap username for downstream workload and Ansible handoff."
-  value       = module.debian_template.bootstrap_username
+  description = "Bootstrap SSH username baked into the approved template."
+  value       = local.template_contract.bootstrap_username
 }
