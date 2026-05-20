@@ -12,8 +12,30 @@ output "vms" {
   }
 }
 
+output "ansible_inventory" {
+  description = "Version 1 Terraform-to-Ansible inventory contract."
+  value = {
+    all = {
+      children = {
+        for group in toset([
+          for key, vm in module.vm : var.vms[key].ansible_group
+          if vm.ipv4_address != "dhcp"
+          ]) : group => {
+          hosts = {
+            for key, vm in module.vm : key => {
+              ansible_host = split("/", vm.ipv4_address)[0]
+              ansible_user = vm.bootstrap_username
+            }
+            if vm.ipv4_address != "dhcp" && var.vms[key].ansible_group == group
+          }
+        }
+      }
+    }
+  }
+}
+
 output "ansible_inventory_hosts" {
-  description = "Ansible-ready host map derived from workload VM definitions."
+  description = "Legacy compatibility host map derived from workload VM definitions."
   value = {
     for key, vm in module.vm : key => {
       ansible_host = split("/", vm.ipv4_address)[0]
