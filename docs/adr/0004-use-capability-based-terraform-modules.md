@@ -13,6 +13,6 @@ Use capability-based Terraform modules.
 
 ## Consequences
 
-- module directories express reusable functions such as SDN, template, or VM creation
+- module directories express reusable functions such as Linux bridge fabric, template, or VM creation
 - environment or state-specific orchestration remains in root modules under `terraform/live/prod/`
 - module naming must not encode `prod` or other environment labels
