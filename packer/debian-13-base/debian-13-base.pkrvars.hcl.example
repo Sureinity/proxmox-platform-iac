@@ -1,0 +1,26 @@
+proxmox_url                    = "https://pve.example.com:8006/api2/json"
+proxmox_username               = "packer@pve!image-factory"
+proxmox_api_token              = "REPLACE_WITH_PROXMOX_API_TOKEN"
+proxmox_insecure_skip_tls_verify = false
+
+proxmox_node        = "pve01"
+proxmox_pool        = "infra-templates"
+source_template_name = "debian-13-cloud-bootstrap"
+
+template_name_override = ""
+template_profile       = "base"
+build_id               = "20260520"
+
+bootstrap_bridge        = "vmbr0"
+cloud_init_storage_pool = "local-lvm"
+ssh_username            = "debian"
+ssh_timeout             = "20m"
+
+cpu_cores = 2
+memory_mb = 2048
+cpu_type  = "host"
+
+bootstrap_dns_servers = ["1.1.1.1", "8.8.8.8"]
+bootstrap_search_domain = "internal.example.com"
+
+manifest_output = "output/debian-13-base-manifest.json"
