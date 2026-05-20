@@ -22,6 +22,7 @@ Focus on the stable platform decisions:
 
 - secure multi-tier application platform
 - four-zone network model
+- Proxmox Linux bridge fabric with OPNsense as the internal routing and policy control plane
 - reverse-proxy-only ingress in Version 1
 - one real environment under `terraform/live/prod/`
 
@@ -49,6 +50,8 @@ Read:
 
 Your working mental model should be:
 
+- Proxmox provides L2 bridge transport, not Version 1 routing or firewall policy
+- OPNsense owns zone gateways and inter-zone policy
 - `edge` is semi-trusted and public-facing
 - `app` and `data` are internal service zones
 - `mgmt` is the administrative control plane
@@ -81,8 +84,8 @@ Then continue through the remaining accepted decisions.
 If you can describe the platform flow below without consulting implementation code, you are ready to contribute:
 
 1. Packer builds the reusable image input.
-2. Terraform `network` establishes segmented connectivity.
+2. Terraform `network` establishes Linux bridge fabric and the internal OPNsense control plane.
 3. Terraform `image-factory` creates the reusable Proxmox template.
 4. Terraform `workloads` provisions the platform VMs.
-5. Cloud-init bootstraps host identity and networking.
+5. Cloud-init bootstraps host identity and static network addressing for the core Linux VMs.
 6. Ansible configures the guest OS and services.
