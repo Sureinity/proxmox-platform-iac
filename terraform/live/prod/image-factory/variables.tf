@@ -21,7 +21,7 @@ variable "proxmox_api_token" {
 
 variable "proxmox_insecure_tls" {
   type        = bool
-  description = "Allow insecure TLS connections to Proxmox. Use only for labs with self-signed certificates."
+  description = "Allow insecure TLS connections to Proxmox. Use only when explicitly accepting self-signed or otherwise untrusted certificates."
   default     = false
 }
 
