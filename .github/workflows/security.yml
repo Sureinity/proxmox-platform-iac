@@ -3,16 +3,18 @@ name: Security
 on:
   pull_request:
     paths:
+      - "packer/**"
       - "terraform/**"
       - "ansible/**"
-      - ".github/workflows/security.yml"
+      - ".github/workflows/**"
   push:
     branches:
       - main
     paths:
+      - "packer/**"
       - "terraform/**"
       - "ansible/**"
-      - ".github/workflows/security.yml"
+      - ".github/workflows/**"
 
 jobs:
   trivy-config:

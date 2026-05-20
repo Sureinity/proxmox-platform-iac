@@ -4,12 +4,14 @@ on:
   pull_request:
     paths:
       - "terraform/**"
+      - "packer/**"
       - ".github/workflows/terraform.yml"
   push:
     branches:
       - main
     paths:
       - "terraform/**"
+      - "packer/**"
       - ".github/workflows/terraform.yml"
 
 jobs:
@@ -41,6 +43,54 @@ jobs:
             terraform -chdir="$dir" init -backend=false -input=false
             terraform -chdir="$dir" validate
           done
+
+      - name: Create sample image-factory manifest
+        run: |
+          mkdir -p packer/debian-13-base/output
+          cat > packer/debian-13-base/output/debian-13-base-manifest.json <<'EOF'
+          {
+            "builds": [
+              {
+                "name": "debian-13-base",
+                "builder_type": "proxmox-clone",
+                "artifact_id": "100",
+                "custom_data": {
+                  "build_id": "20260520",
+                  "bootstrap_username": "debian",
+                  "bootstrap_bridge": "vmbr0",
+                  "cloud_init_pool": "local-lvm",
+                  "debian_major_version": "13",
+                  "source_template_name": "debian-13-cloud-bootstrap",
+                  "template_name": "tmpl-debian-13-base-20260520",
+                  "template_node_name": "pve01",
+                  "template_profile": "base"
+                }
+              }
+            ],
+            "custom_data": {
+              "build_id": "20260520",
+              "bootstrap_username": "debian",
+              "bootstrap_bridge": "vmbr0",
+              "cloud_init_pool": "local-lvm",
+              "debian_major_version": "13",
+              "source_template_name": "debian-13-cloud-bootstrap",
+              "template_name": "tmpl-debian-13-base-20260520",
+              "template_node_name": "pve01",
+              "template_profile": "base"
+            }
+          }
+          EOF
+
+      - name: Validate image-factory manifest contract
+        run: |
+          jq -e '
+            .builds | length > 0 and
+            .custom_data.template_name and
+            .custom_data.template_node_name and
+            .custom_data.bootstrap_username and
+            .custom_data.template_profile and
+            .custom_data.build_id
+          ' packer/debian-13-base/output/debian-13-base-manifest.json
 
   tflint:
     name: TFLint
