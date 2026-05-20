@@ -179,9 +179,11 @@ build {
     strip_path = true
     custom_data = {
       build_id             = local.effective_build_id
+      bootstrap_username   = var.ssh_username
       bootstrap_bridge     = var.bootstrap_bridge
       cloud_init_pool      = var.cloud_init_storage_pool
       debian_major_version = var.debian_major_version
+      template_node_name   = var.proxmox_node
       source_template_name = var.source_template_name
       template_name        = local.template_name
       template_profile     = var.template_profile
